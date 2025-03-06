@@ -1,5 +1,6 @@
-import React from "react";
+import React, {useState} from "react";
 import mailPicture from "../assets/send-mail.jpg";
+import axios from 'axios';
 
 function Contact (){
     const mainContentStyle ={
@@ -55,7 +56,27 @@ function Contact (){
         boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", 
         marginBottom:"15px",
     };
-     
+
+    const [email, setEmail] = useState('');
+    const [subject, setSubject] = useState('');
+    const [message, setMessage] = useState('');
+    
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+    
+        const data = { email, subject, message };
+    
+        try {
+          const response = await axios.post('http://localhost:5000/contact', data);
+            setEmail('');
+            setSubject('');
+            setMessage('');
+          console.log("Mail sent succesfully")
+        } catch (error) {
+            console.log("Mail sending failed")
+        }
+      };
+
     return(
         <>
             <div style={mainContentStyle2}>
@@ -69,10 +90,10 @@ Feel free to reach out to us, and we’ll get back to you as soon as possible!</
             </div>
             <div style={mainContentStyle}>
                 <div>
-                    <input type="text" name="email" placeholder="Your email addres" style={inputStyle}></input> <br></br>
-                    <input type="text" name="subject" placeholder="Subject" style={inputStyle}></input>    
-                    <textarea style={textareaStyle} placeholder="Your mail here"></textarea>
-                    <div style={buttonStyle}>Send!</div>
+                    <input type="text" name="email" placeholder="Your email addres" style={inputStyle} onChange={(e) => setEmail(e.target.value)}></input> <br></br>
+                    <input type="text" name="subject" placeholder="Subject" style={inputStyle} onChange={(e) => setSubject(e.target.value)}></input>    
+                    <textarea style={textareaStyle} name="message" placeholder="Your mail here" onChange={(e) => setMessage(e.target.value)}></textarea>
+                    <div style={buttonStyle} onClick={handleSubmit}>Send!</div>
                 </div>
                 <div>
                     <img src={mailPicture} style={{width:'550px'}}></img>
