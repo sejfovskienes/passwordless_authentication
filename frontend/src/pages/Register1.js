@@ -1,7 +1,29 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
+import { Link, navigate } from "react-router-dom";
 
 function Register1(){
+    const [inputEmail, setInputEmail] = useState("");
+        const navigate = useNavigate(); 
+      
+        const handleSubmit = async (e) => {
+          e.preventDefault();
+           console.log("Entered email:", inputEmail);
+      
+          try {
+            const response = await axios.post("http://127.0.0.1:5000/request-challenge", { email: inputEmail });
+      
+             console.log("Challenge:", response.data.challenge);
+      
+            navigate("/register/step2", { state: { email: inputEmail, challenge: response.data.challenge } });
+      
+          } catch (error) {
+             console.error("Request failed:", error);
+          }
+        };
+
     const mainDivStyle = {
         height: "250px",
         width: "500px",
@@ -54,8 +76,8 @@ function Register1(){
 
             <form style={formStyle}>
                 <p>Your email address</p>
-                <input type="email" name="email" style={inputStyle} />
-                <Link to="/register/step2" style={buttonStyle}>Next Step</Link>
+                <input type="email" name="email" style={inputStyle} onChange={(e) => setInputEmail(e.target.value)} required />
+                <Link to="/register/step2" style={buttonStyle} onClick={handleSubmit}>Next Step</Link>
             </form>
             
         </div>
