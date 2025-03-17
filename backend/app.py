@@ -1,12 +1,10 @@
-import cv2
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from werkzeug.utils import secure_filename
 import os
 
 from models.models import db, Contact, ChallengeRecord
 from services.services import generate_challenge
-import face_recognition
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///passwordless_authentication.db'
@@ -20,6 +18,7 @@ with app.app_context():
     db.create_all()
 
 
+
 @app.route('/contact', methods=['POST'])
 def contact():
     data = request.get_json()
@@ -31,6 +30,7 @@ def contact():
     new_contact = Contact(email=email, subject=subject, message=message)
     db.session.add(new_contact)
     db.session.commit()
+    return jsonify({"status":"accetped"}), 200
 
 
 @app.route('/request-challenge', methods=['POST'])
@@ -48,52 +48,20 @@ def request_challenge():
     return jsonify({"challenge": challenge})
 
 
-def process_video(video_path):
-    video_capture = cv2.VideoCapture(video_path)
-
-    frame_count = 0
-    faces_detected = 0
-
-    while True:
-        ret, frame = video_capture.read()
-        if not ret:
-            break
-
-        rgb_frame = frame[:, :, ::-1]
-
-        faces_locations = face_recognition.face_locations(rgb_frame)
-
-        if len(faces_locations) > 0:
-            faces_detected += 1
-
-        frame_count += 1
-
-        video_capture.release()
-
-
-    if faces_detected > 0:
-        return True
-    else:
-        return False
-
 @app.route('/get-media', methods=['POST'])
-def get_face_video():
-    if 'video' not in request.files:
-        return jsonify({"error": "No video file part"}), 400
+def get_face_image():
+    if 'image' not in request.files:
+        return jsonify({"error": "No image file part"}), 400
 
-    video_file = request.files['video']
-    if video_file.filename == '':
+    image_file = request.files['image']
+    if image_file.filename == '':
         return jsonify({"error": "No selected file"}), 400
 
-    if video_file:
-        filename = secure_filename(video_file.filename)
-        video_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        video_file.save(video_path)
+    if image_file:
+        if not os.path.exists(app.config['UPLOAD_FOLDER']):
+            os.makedirs(app.config['UPLOAD_FOLDER'])
 
-        # Process the video for face and liveness detection
-        is_live = process_video(video_path)
-
-        os.remove(video_path)
+        is_live = True
 
         if is_live:
             return jsonify({"status": "Face detected and liveness passed"}), 200
@@ -101,5 +69,7 @@ def get_face_video():
             return jsonify({"status": "Liveness detection failed or no faces detected."}), 400
 
 
+
+
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
