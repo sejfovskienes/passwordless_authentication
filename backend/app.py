@@ -1,6 +1,10 @@
+import cv2
+import face_recognition_models
+import numpy as np
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import os
+from PIL import Image
+import face_recognition
 
 from models.models import db, Contact, ChallengeRecord
 from services.services import generate_challenge
@@ -48,27 +52,40 @@ def request_challenge():
     return jsonify({"challenge": challenge})
 
 
-@app.route('/get-media', methods=['POST'])
-def get_face_image():
-    if 'image' not in request.files:
-        return jsonify({"error": "No image file part"}), 400
+@app.route('/generate-template', methods=['POST'])
+def generate_template():
+    pass
 
-    image_file = request.files['image']
-    if image_file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
+    try:
+        print(request.files)
 
-    if image_file:
-        if not os.path.exists(app.config['UPLOAD_FOLDER']):
-            os.makedirs(app.config['UPLOAD_FOLDER'])
+        image_data = request.files.get('image')
 
-        is_live = True
+        if not image_data:
+            return jsonify({'error' : 'No image provided'}), 400
 
-        if is_live:
-            return jsonify({"status": "Face detected and liveness passed"}), 200
-        else:
-            return jsonify({"status": "Liveness detection failed or no faces detected."}), 400
+        image = Image.open(image_data)
+        image = np.array(image)
 
+        if image.shape[-1] == 4:
+            image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
+        elif len(image.shape) == 2 or image.shape[-1] == 1:
+            image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
 
+        face_locations = face_recognition.face_locations(image)
+
+        if not face_locations:
+            return jsonify({'error' : 'No face detected'}), 400
+
+        face_encodings = face_recognition.face_encodings(image)
+
+        face_template = face_encodings[0].tolist()
+
+        print(face_template)
+        return jsonify({'biometric_template': face_template}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':

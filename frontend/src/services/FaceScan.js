@@ -1,5 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { GenerateKeysFromFace } from "../services/GenerateKeysFromFace.js";
+import { SavePrivateKeyToFile } from "./SavePrivateKeyToFile.js";
+
 
 function FaceScan() {
     const videoRef = useRef(null);
@@ -43,16 +46,23 @@ function FaceScan() {
         async function sendToBackend(imageBlob) {
             const formData = new FormData();
             formData.append("image", imageBlob, "face_scan.png");
-
+        
             try {
-                const response = await fetch("http://localhost:5000/get-media", {
+                const response = await fetch("http://localhost:5000/generate-template", {  
                     method: "POST",
                     body: formData,
                 });
+        
+                const data = await response.json();  
+        
+                if (response.ok && data.biometric_template) {
 
-                if (response.ok) {
+                    const keys = GenerateKeysFromFace(data.biometric_template)
+                    SavePrivateKeyToFile(keys.privateKey)
+
                     navigate(source_url === "register" ? "/register/step2?success=true" : "/login/step2?success=true");
                 } else {
+                    console.error("Backend error:", data.error);
                     navigate(source_url === "register" ? "/register/step2?success=false" : "/login/step2?success=false");
                 }
             } catch (error) {
@@ -60,6 +70,7 @@ function FaceScan() {
                 navigate("/login/step2?success=false");
             }
         }
+        
 
         document.addEventListener("keydown", handleKeyPress);
         startCamera();
@@ -73,6 +84,7 @@ function FaceScan() {
         <div style={{ display: "flex", flexDirection: "column", marginTop: "1.5%" }}>
             <h1 style={{ marginLeft: "auto", marginRight: "auto" }}>Scan your face to gain access</h1>
             <p style={{ marginLeft: "auto", marginRight: "auto" }}>Please keep the device in such a position where your face is visible. The data you provide will be used just for system purposes.</p>
+            <p style={{ marginLeft: "auto", marginRight: "auto" }}>When the camera captures your face, press Q on your keyboard to scan your face.</p>
             {cameraError ? (
                 <p style={{ color: "red" }}>Camera access denied. Please allow camera permissions.</p>
             ) : (

@@ -11,6 +11,8 @@ import Register2 from './pages/Register2';
 import AboutUs from './pages/AboutUs';
 import Contact from './pages/Contact';
 import FaceScan from './services/FaceScan';
+import { Buffer } from "buffer";
+window.Buffer = Buffer;
 
 
 function App() {
