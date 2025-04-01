@@ -11,6 +11,16 @@ function FaceScan() {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const storedEmail = localStorage.getItem("email");
+    const { email } = location.state || { email: storedEmail };
+
+    if (!email) {
+    console.log("Email is missing in FaceScan");
+    } else {
+        console.log(email)
+    localStorage.setItem("email", email); // Keep it stored
+    }
+
     const queryParams = new URLSearchParams(location.search);
     const source_url = queryParams.get("source");
 
@@ -60,7 +70,9 @@ function FaceScan() {
                     const keys = GenerateKeysFromFace(data.biometric_template)
                     SavePrivateKeyToFile(keys.privateKey)
 
-                    navigate(source_url === "register" ? "/register/step2?success=true" : "/login/step2?success=true");
+                    navigate(source_url === "register" ? "/register/step2?success=true" : "/login/step2?success=true", {
+                        state: { email: email, publicKey: keys.publicKey }
+                    });
                 } else {
                     console.error("Backend error:", data.error);
                     navigate(source_url === "register" ? "/register/step2?success=false" : "/login/step2?success=false");

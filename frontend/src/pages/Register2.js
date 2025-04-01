@@ -1,57 +1,49 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import {GenerateKeysFromFace} from "../services/GenerateKeysFromFace.js"; 
 
 function Register2() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { email, challenge } = location.state || {};
-  // const [responseStatus, setResponseStatus] = useState(false);
-
+  
   const queryParams = new URLSearchParams(location.search);
   const responseStatus = queryParams.get("success");
-  
+  const publicKey = location.state?.publicKey;
 
-  
-  const openFaceScanWindow = () => {
-    const faceScanWindow = window.open(
-      "/face-scan",
-      "FaceScan",
-      "width=400,height=500,left=500,top=200"
-    );
+  const storedEmail = localStorage.getItem("email");
+  const { email } = location.state || { email: email };
 
-    window.addEventListener("message", (event) => {
-      if (event.origin !== window.location.origin) return;
-      if (event.data.success) {
-        //setResponseStatus(true);
-      }
-    });
-  };
-
-  
-  const handleLogin = async () => {
-    if (!responseStatus) {
-      alert("Please complete the face scan first!");
-      return;
-    }
-
+  if (!email) {
+    console.log("Email is missing in Register2");
+  }else{
+    console.log("email in register2" + email)
+  }
+  const handleRegister = async () => {
     try {
-      const response = await axios.post("http://127.0.0.1:5000/verify-face", {
-        email,
-        challenge,
-      });
+        const response = await fetch("http://localhost:5000/register_data", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, publicKey })  
+        });
 
-      if (response.data.success) {
-        alert("Login successful!");
-        navigate("/dashboard");
-      } else {
-        alert("Face authentication failed.");
-      }
+        const data = await response.json();
+        console.log("Backend Response:", data);
+
+        if (response.ok) {
+            alert("Registration successful!");
+        } else {
+            console.error("Registration failed:", data.error);
+            alert("Error: " + data.error);
+        }
     } catch (error) {
-      console.error("Verification failed:", error);
-      alert("Error during login.");
+        console.error("Request failed:", error);
+        alert("Error sending data to server.");
     }
-  };
+};
+
 
   return (
     <div style={{
@@ -74,17 +66,17 @@ function Register2() {
         <p style={{ color: responseStatus ? 'green' : 'red' }}>
           {responseStatus ? 'Face scanned successfully!' : 'You need to scan your face'}
         </p>
-        <button onClick={() => navigate("/face-scan?source=register")} style={{
+        <button onClick={() => navigate("/face-scan?source=register", { state: { email } })} style={{
           backgroundColor: "#0a2540",
           color: "#fff",
           borderRadius: "8px",
           padding: "10px 20px",
-          cursor: responseStatus === "true" ? "not-allowed" : "pointer"}}
-          disabled={responseStatus === "true"}>
+          cursor: responseStatus === "true" ? "not-allowed" : "pointer"
+        }} disabled={responseStatus === "true"}>
           Scan!
         </button>
       </div>
-      <button onClick={handleLogin} style={{
+      <button onClick={handleRegister} style={{
         backgroundColor: responseStatus ? "#0a2540" : "gray",
         color: "#fff",
         borderRadius: "8px",

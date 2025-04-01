@@ -90,9 +90,31 @@ Feel free to reach out to us, and we’ll get back to you as soon as possible!</
             </div>
             <div style={mainContentStyle}>
                 <div>
-                    <input type="text" name="email" placeholder="Your email addres" style={inputStyle} onChange={(e) => setEmail(e.target.value)}></input> <br></br>
-                    <input type="text" name="subject" placeholder="Subject" style={inputStyle} onChange={(e) => setSubject(e.target.value)}></input>    
-                    <textarea style={textareaStyle} name="message" placeholder="Your mail here" onChange={(e) => setMessage(e.target.value)}></textarea>
+                <input 
+    type="text" 
+    name="email" 
+    placeholder="Your email address" 
+    style={inputStyle} 
+    value={email} 
+    onChange={(e) => setEmail(e.target.value)} 
+/>
+
+<input 
+    type="text" 
+    name="subject" 
+    placeholder="Subject" 
+    style={inputStyle} 
+    value={subject} 
+    onChange={(e) => setSubject(e.target.value)} 
+/>
+
+<textarea 
+    style={textareaStyle} 
+    name="message" 
+    placeholder="Your mail here" 
+    value={message} 
+    onChange={(e) => setMessage(e.target.value)} 
+/>
                     <div style={buttonStyle} onClick={handleSubmit}>Send!</div>
                 </div>
                 <div>

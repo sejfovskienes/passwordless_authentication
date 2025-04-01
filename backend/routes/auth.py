@@ -8,7 +8,7 @@ users_db = {}  # Store face embeddings { "username": face_encoding }
 
 @auth_blueprint.route("/register", methods=["POST"])
 def register():
-    return None
+    return jsonify({"status":"endpoint reached"}), 200
 
 @auth_blueprint.route("/login", methods=["POST"])
 def login():
