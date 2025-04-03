@@ -13,10 +13,10 @@ function Login1({ setEmail, setChallenge }) {
   
       try {
         const response = await axios.post("http://127.0.0.1:5000/request-challenge", { email: inputEmail });
-  
-         console.log("Challenge:", response.data.challenge);
-  
-        navigate("/login/step2", { state: { email: inputEmail, challenge: response.data.challenge } });
+
+        const challenge = response.data.challenge; 
+        console.log("Challenge:", challenge);
+        navigate("/login/step2", { state: { email: inputEmail, challenge: challenge } });
   
       } catch (error) {
         console.error("Request failed:", error);

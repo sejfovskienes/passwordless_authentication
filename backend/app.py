@@ -7,6 +7,7 @@ from flask_cors import CORS
 from PIL import Image
 import face_recognition
 import sqlite3
+from services import bio_template_service
 
 from models.models import db, Contact, ChallengeRecord, User
 from services.services import generate_challenge
@@ -86,6 +87,7 @@ def register_data():
 @app.route('/generate-template', methods=['POST'])
 def generate_template():
     try:
+        # Check if the image is provided in the request
         print(request.files)
         image_data = request.files.get('image')
 
@@ -94,32 +96,24 @@ def generate_template():
 
         image_data.seek(0)  # Ensure file pointer is at the beginning
         image = Image.open(image_data)
-        image = np.array(image)
 
+        # Convert image to RGB (if necessary)
+        image = np.array(image)
         if image.shape[-1] == 4:
             image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
         elif len(image.shape) == 2 or image.shape[-1] == 1:
             image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
 
-        face_locations = face_recognition.face_locations(image)
+        # Generate the biometric template using FaceNet
+        biometrical_template = bio_template_service.generate_biometrical_template(image)
 
-        if not face_locations:
-            return jsonify({'error': 'No face detected'}), 400
+        # Convert the biometric template to a list to return it in the response
+        return jsonify({'biometric_template': biometrical_template.tolist()}), 200
 
-        face_encodings = face_recognition.face_encodings(image, face_locations)
-
-        if not face_encodings:
-            return jsonify({'error': 'Failed to encode face'}), 400
-
-        face_template = face_encodings[0].tolist()
-
-        print(face_template)
-        print("================== GENERATING FACE TEMPLATE PHASE PASSED ==================")
-        return jsonify({'biometric_template': face_template}), 200
-
-
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({'error': 'An unexpected error occurred: ' + str(e)}), 500
 
 
 if __name__ == '__main__':
