@@ -12,7 +12,7 @@ function Register2() {
   const publicKey = location.state?.publicKey;
 
   const storedEmail = localStorage.getItem("email");
-  const { email } = location.state || { email: email };
+  const { email } = location.state || {};
 
   if (!email) {
     console.log("Email is missing in Register2");

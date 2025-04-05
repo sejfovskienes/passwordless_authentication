@@ -1,5 +1,3 @@
-
-
 import cv2
 import numpy as np
 from flask import Flask, request, jsonify
@@ -99,6 +97,11 @@ def generate_template():
 
         # Convert image to RGB (if necessary)
         image = np.array(image)
+
+        print("Image type:", type(image))
+        print("Image shape:", image.shape if isinstance(image, np.ndarray) else "Not numpy array")
+
+
         if image.shape[-1] == 4:
             image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
         elif len(image.shape) == 2 or image.shape[-1] == 1:
