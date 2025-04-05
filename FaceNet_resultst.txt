@@ -1,0 +1,42 @@
+1. first try:
+{
+    
+    "face_id": "128d6eb2f530ad35a7d86f554a4a511602444cc8d19b4ea66ec4477c1ca587b5"
+}
+
+2. second try:
+{
+    
+    "face_id": "b258415c37b65ae0e19616428b56badb52a8f598bc8591ec15d4b71975de541b"
+}
+
+3. third try:
+"face_id": "f65dfd58f0119dd218b4d079f33873e4f289ef2a25dcd160d5faec5d824faf0e"
+}
+
+4."face_id": "11541dee41d8a67f59d44504f6959123c029462f202ea9943c4d9220d9038314"
+
+
+=================================================== MODIFICATION 1: CENTERING FACE =================================================== 
+
+1.  "face_id": "face_id": "2512e4fd80b6f196bbc720c8c6495e96cd4ffb3b20485a08e1e68af65fe81234"
+
+
+2. "face_id": "65b49c858de8418f400db653c154c0ec411cc71ba786171170ce4a5138a6ceab"
+
+
+3.  "face_id": "fdaa7ff7f75705f656e0d20411c22442b3494d9239195f89c9a6229b0fbf5834"
+
+
+4.  "face_id": "3b1a0c8bb578661ca36d6d00666d91e32519284953b18dc8ddeddf1bcc830591"
+
+
+=================================================== MODIFICATION 2: Use Deterministic Face Cropping + Embedding Matching =================================================== 
+
+1. {"face_id":"aa3a8e12b4e90c4c6943146fde68449e8f9db20e85922b76b0a823c6439c2cec"}
+
+2.{"face_id":"43516e4e17065850e7f4cc9654aadd5860041184ffe90812ba8ba0fdbe354e82"}
+
+3.{"face_id":"b412eae9e7c89c28a7852511306097cbad9f4fa55c21038abd248df688622478"}
+
+4.{"face_id":"eafbd08949e10d33ab6f6d1a5089ee4bbd8a635b5126692305513d3fd2488f6d"}

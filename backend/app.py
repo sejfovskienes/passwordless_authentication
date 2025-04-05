@@ -60,7 +60,7 @@ def register_data():
         email = data.get('email')
         public_key = data.get('publicKey')
 
-        # Validate the incoming data
+
         if not email and not public_key:
             return jsonify({"error": "Missing email and public key"}), 400
         elif not email and public_key:
@@ -70,7 +70,7 @@ def register_data():
 
         new_user = User(email=email, public_key=public_key)
         db.session.add(new_user)
-        db.session.commit()  # Commit transaction
+        db.session.commit()
 
         print("User added to the database:", new_user)
         print("================== REGISTRATION PHASE PASSED ==================")
@@ -85,33 +85,25 @@ def register_data():
 @app.route('/generate-template', methods=['POST'])
 def generate_template():
     try:
-        # Check if the image is provided in the request
-        print(request.files)
         image_data = request.files.get('image')
 
         if not image_data:
             return jsonify({'error': 'No image provided'}), 400
 
-        image_data.seek(0)  # Ensure file pointer is at the beginning
+        image_data.seek(0)
         image = Image.open(image_data)
-
-        # Convert image to RGB (if necessary)
         image = np.array(image)
-
-        print("Image type:", type(image))
-        print("Image shape:", image.shape if isinstance(image, np.ndarray) else "Not numpy array")
-
 
         if image.shape[-1] == 4:
             image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
         elif len(image.shape) == 2 or image.shape[-1] == 1:
             image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
 
-        # Generate the biometric template using FaceNet
-        biometrical_template = bio_template_service.generate_biometrical_template(image)
+        face_id, biometric_template = bio_template_service.generate_biometrical_template(image)
 
-        # Convert the biometric template to a list to return it in the response
-        return jsonify({'biometric_template': biometrical_template.tolist()}), 200
+        return jsonify({
+            'face_id': face_id
+        }), 200
 
     except ValueError as e:
         return jsonify({'error': str(e)}), 400

@@ -18,7 +18,7 @@ function FaceScan() {
     console.log("Email is missing in FaceScan");
     } else {
         console.log(email)
-    localStorage.setItem("email", email); // Keep it stored
+    localStorage.setItem("email", email); 
     }
 
     const queryParams = new URLSearchParams(location.search);
